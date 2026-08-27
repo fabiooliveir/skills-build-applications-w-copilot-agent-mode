@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
-import { fetchResource } from '../api'
+const apiEndpoint = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/users/`
+  : 'http://localhost:8000/api/users/'
 
 export default function Users() {
   const [users, setUsers] = useState([])
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetchResource('users').then(setUsers).catch((reason) => setError(reason.message))
+    fetch(apiEndpoint).then((response) => response.json()).then((payload) => setUsers(Array.isArray(payload) ? payload : payload.results || payload.data || [])).catch((reason) => setError(reason.message))
   }, [])
 
   if (error) return <div className="alert alert-warning">{error}</div>
